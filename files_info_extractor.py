@@ -12,21 +12,36 @@ class FilesInfoExtractor(object):
     """
 
     def __init__(self):
+        """
+        Initialize the reader.
+        """
         self.file_reader = FilesReader()
 
     def extract_info_from_file(self, filename):
+        """
+        Extracts information from a file.
+        """
         return self.file_reader.extract_infos_from_file(filename)
 
     @staticmethod
     def save_json_file(data, output_name):
+        """
+        Save the data to a json file.
+        """
         with open(output_name + ".json", 'w') as outfile:
             json.dump(data, outfile)
 
     def run(self, filename, output_name):
+        """
+        Extracts the specified file.
+        """
         data = self.extract_info_from_file(filename)
         FilesInfoExtractor.save_json_file(data, output_name)
 
 def arguments():
+    """
+    Parse command line arguments.
+    """
     parser = argparse.ArgumentParser(description='.')
     parser.add_argument(
         'filename', help='filename.')
@@ -36,6 +51,9 @@ def arguments():
 
 
 def main(args):
+    """
+    Main entry point.
+    """
     FilesInfoExtractor().run(args.filename, args.output_name)
 
 

@@ -13,6 +13,9 @@ class YakeExtractor(object):
 
     def __init__(self, lang="en", size_window=1,
                  max_n_gram=3, top_k=20, thresh=0.9):
+        """
+        Initialize the corpus.
+        """
         super(YakeExtractor, self).__init__()
         self.lang = lang
         self.size_window = size_window
@@ -31,6 +34,9 @@ class YakeExtractor(object):
 
     @staticmethod
     def text_to_sentences(text):
+        """
+        Convert text into sentences.
+        """
         splited_text = [w for w in split_multi(text)]
         splited_sentences = [[w for w in split_contractions(
             web_tokenizer(s))] for s in splited_text]
@@ -38,6 +44,9 @@ class YakeExtractor(object):
 
     @staticmethod
     def is_digit(token):
+        """
+        Returns true if token is a digit
+        """
         try:
             token_c = token.replace(",", ".")
             float(token_c)
@@ -47,6 +56,9 @@ class YakeExtractor(object):
 
     @staticmethod
     def is_acronym(token):
+        """
+        Returns true if token is a token.
+        """
         nb_upper = len([c for c in token if c.isupper()])
         if nb_upper == len(token):
             return True
@@ -54,12 +66,18 @@ class YakeExtractor(object):
 
     @staticmethod
     def is_uppercase(token, idx):
+        """
+        Returns true if the token is a string.
+        """
         if idx > 1 and len(token) > 1 and token[0].isupper():
             return True
         return False
 
     @staticmethod
     def is_unparsable_content(token, ponctuation):
+        """
+        Return true if token is unponctuation.
+        """
         nb_digit = len([c for c in token if c.isdigit()])
         nb_alpha = len([c for c in token if c.isalpha()])
         nb_ponctuation = len([c for c in token if c in ponctuation])
@@ -69,6 +87,9 @@ class YakeExtractor(object):
 
     @staticmethod
     def extract_tag(token, idx, ponctuation):
+        """
+        Extracts the token from a token.
+        """
         if YakeExtractor.is_digit(token):
             return "d"
         if YakeExtractor.is_acronym(token):
@@ -81,6 +102,9 @@ class YakeExtractor(object):
 
     @staticmethod
     def levenshtein(seq1, seq2):
+        """
+        Compute the levenshtein distance between two sequences.
+        """
         size_x = len(seq1) + 1
         size_y = len(seq2) + 1
         matrix = np.zeros((size_x, size_y))
@@ -108,6 +132,9 @@ class YakeExtractor(object):
         return 1 - float(dist) / length
 
     def read_stop_words(self):
+        """
+        Read stop stop words.
+        """
         dir_path = os.path.dirname(os.path.realpath(__file__))
         stop_words_path = os.path.join(
             dir_path,
@@ -117,6 +144,9 @@ class YakeExtractor(object):
             self.stop_words = set(stop_fil.read().lower().split("\n"))
 
     def build_vocab_coocurance_candidates(self, texts):
+        """
+        Parameters ---------- texts : list of sentences.
+        """
         self.sentences = []
 
         for text in texts:
@@ -202,6 +232,9 @@ class YakeExtractor(object):
                             self.candidates[candidate_str]["TF"] += 1
 
     def compute_features(self):
+        """
+        Compute features.
+        """
         TF = [val["TF"] for val in self.vocab.values()]
         TF_nstopword = [val["TF"]
                         for val in self.vocab.values() if not val["is_stopword"]]
@@ -253,6 +286,9 @@ class YakeExtractor(object):
                 (REL * POS) / (CASE + NORM / REL + SENT / REL))
 
     def compute_candidates_scores(self):
+        """
+        Parameters ---------- candidate scores.
+        """
         for candidate_str in self.candidates.keys():
             tokens = candidate_str.split(" ")
             prod_S = 1.0
@@ -282,6 +318,9 @@ class YakeExtractor(object):
                 prod_S) / (tf * (1 + sum_S))
 
     def extract_keyphrases(self, docs):
+        """
+        Parameters ---------- docphr : dicts.
+        """
         for doc in docs:
             self.build_vocab_coocurance_candidates(doc)
         self.compute_features()

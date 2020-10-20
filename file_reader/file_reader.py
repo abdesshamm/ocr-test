@@ -24,6 +24,9 @@ class FilesReader(object):
     """read files from a directory"""
 
     def __init__(self):
+        """
+        Initialize the document
+        """
         self.filenames = {}
         self.file_to_text = {}
         self.ext_to_funct = {".pdf": FilesReader.read_pdf,
@@ -36,6 +39,9 @@ class FilesReader(object):
 
     @staticmethod
     def read_pdf(filename):
+        """
+        Read text from a pdf file.
+        """
         try:
             texts = []
             with open(filename, 'rb') as outfile:
@@ -49,6 +55,9 @@ class FilesReader(object):
 
     @staticmethod
     def read_txt(filename):
+        """
+        Reads a list of text
+        """
         try:
             with open(filename) as f:
                 texts = f.readlines()
@@ -59,6 +68,9 @@ class FilesReader(object):
 
     @staticmethod
     def read_docx(filename):
+        """
+        Read a list of a docx file.
+        """
         try:
             doc = docx.Document(filename)
             texts = []
@@ -71,6 +83,9 @@ class FilesReader(object):
 
     @staticmethod
     def read_pptx(filename):
+        """
+        Read text files from a text file.
+        """
         try:
             prs = Presentation(filename)
             texts = []
@@ -89,6 +104,9 @@ class FilesReader(object):
 
     @staticmethod
     def read_xlsx(filename):
+        """
+        Reads an excel excel dataframe
+        """
         try:
             excel_df = pd.read_excel(filename)
             texts = excel_df.to_string().split("  ")
@@ -98,18 +116,30 @@ class FilesReader(object):
             return []
 
     def link_tag_to_document(self, filename, tag):
+        """
+        Add the document to the document.
+        """
         if filename in list(self.filenames.keys()):
             self.filenames[filename]["tag"] = tag
 
     def link_tag_to_documents(self, filenames, tag):
+        """
+        Convert documents to a list of documents.
+        """
         for filename in filenames:
             self.link_tag_to_document(filename, tag)
 
     def unlink_tag_from_document(self, filename):
+        """
+        Removes an html tag from a file.
+        """
         if filename in list(self.filenames.keys()):
             self.filename[filename]["tag"] = self.NO_TAG
 
     def read_documents(self, filenames):
+        """
+        Read documents to the documents to - many documents.
+        """
         for filename in filenames:
             ext = os.path.splitext(filename)[1]
             read_ext = self.ext_to_funct.get(ext, None)
@@ -125,10 +155,16 @@ class FilesReader(object):
                     self.filenames[filename]["nb_caractere"] = len(texts_str)
 
     def remove_documents(self, filenames):
+        """
+        Remove documents from the documents.
+        """
         for filename in filenames:
             self.filenames.pop(filename, None)
 
     def get_documents(self):
+        """
+        Return a list of documents.
+        """
         documents = {}
         for filename, file_data in self.filenames.items():
             lang = file_data["lang"]
@@ -143,6 +179,9 @@ class FilesReader(object):
         return documents
 
     def extract_infos_from_file(self, filename):
+        """
+        Extracts infos from a file.
+        """
         ext = os.path.splitext(filename)[1]
         read_ext = self.ext_to_funct.get(ext, None)
         if read_ext is not None:
