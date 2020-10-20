@@ -33,6 +33,9 @@ class KeyPhrasesExtractor(object):
     def __init__(self, input_directory, output_name, top_k_all_docs,
                  top_k_by_doc, top_k_by_tag,
                  max_n_gram, clustering_keyphrases):
+        """
+        Initialize k - merk dataset.
+        """
         self.input_directory = input_directory
         self.output_name = output_name
         self.max_n_gram = max_n_gram
@@ -46,12 +49,18 @@ class KeyPhrasesExtractor(object):
 
     @staticmethod
     def extract_keyphrases(text, max_n_gram, top_k, lang="en"):
+        """
+        Extract keyphrases from text.
+        """
         kw_extractor = YakeExtractor(lang=lang, top_k=top_k, max_n_gram=max_n_gram)
         keywords = kw_extractor.extract_keyphrases(text)
         return keywords
 
     @staticmethod
     def merge_documents_by_tag(texts):
+        """
+        Given a list of texts
+        """
         merged_docs = {}
         for lang in texts.keys():
             for tag in texts[lang].keys():
@@ -63,6 +72,9 @@ class KeyPhrasesExtractor(object):
 
     @staticmethod
     def merge_documents(texts):
+        """
+        Merge texts into a single language
+        """
         merged_docs_by_tag = KeyPhrasesExtractor.merge_documents_by_tag(texts)
         res = {}
         for lang in merged_docs_by_tag.keys():
@@ -75,6 +87,9 @@ class KeyPhrasesExtractor(object):
 
     @staticmethod
     def compute_similarity(phrase1, phrase2):
+        """
+        Computes the similarity between phrase1 and phrase2.
+        """
         tokens1 = phrase1.split(" ")
         tokens2 = phrase2.split(" ")
         return float(len(set(tokens1).intersection(
@@ -82,6 +97,9 @@ class KeyPhrasesExtractor(object):
 
     @staticmethod
     def clustering_keyphrases(keyphrases):
+        """
+        Given a keyphrases.
+        """
         texts = keyphrases
         texts_value = []
         text_treated = []
@@ -102,6 +120,9 @@ class KeyPhrasesExtractor(object):
         return texts_value
 
     def extract_keyphrases_from_documents(self, documents, top_k, doc_by_doc=False):
+        """
+        Extract keyphrases from documents
+        """
         keyphrases = []
         for lang in documents.keys():
             for tag, docs in documents[lang].items():
@@ -122,21 +143,39 @@ class KeyPhrasesExtractor(object):
         return keyphrases
 
     def read_documents(self, filenames):
+        """
+        Read documents from a file.
+        """
         self.file_reader.read_documents(filenames)
 
     def remove_documents(self, filenames):
+        """
+        Removes documents from the document.
+        """
         self.file_reader.remove_documents(filenames)
 
     def link_tag_to_document(self, filename, tag):
+        """
+        Add the document to the document.
+        """
         self.file_reader.link_tag_to_document(filename, tag)
 
     def link_tag_to_documents(self, filename, tag):
+        """
+        Add links to a file.
+        """
         self.file_reader.link_tag_to_documents(filename, tag)
 
     def unlink_tag_from_document(self, filename, tag):
+        """
+        Unlink an html document from the document.
+        """
         self.file_reader.unlink_tag_from_document(filename, tag)
 
     def apply_doc_by_doc(self):
+        """
+        Parameters ---------- doc_reader to all documents.
+        """
         documents = self.file_reader.get_documents()
         keyphrases = self.extract_keyphrases_from_documents(
             documents, self.top_k_by_doc, True)
@@ -144,6 +183,9 @@ class KeyPhrasesExtractor(object):
             pd.DataFrame(keyphrases, columns=self.df_result.columns))
 
     def apply_by_tag(self):
+        """
+        Parameters ---------- tag_readerphrases
+        """
         documents = self.file_reader.get_documents()
         merged_documents = KeyPhrasesExtractor.merge_documents_by_tag(
             documents)
@@ -153,6 +195,9 @@ class KeyPhrasesExtractor(object):
             pd.DataFrame(keyphrases, columns=self.df_result.columns))
 
     def apply_to_all_documents(self):
+        """
+        Parameters ---------- documents
+        """
         documents = self.file_reader.get_documents()
         merged_documents = KeyPhrasesExtractor.merge_documents(documents)
         keyphrases = self.extract_keyphrases_from_documents(
@@ -161,6 +206,9 @@ class KeyPhrasesExtractor(object):
             pd.DataFrame(keyphrases, columns=self.df_result.columns))
 
     def normalize_scores(self):
+        """
+        Normalize scores
+        """
         unique_value = self.df_result[[
             "lang", "tag", "filename"]].copy().drop_duplicates()
 
@@ -175,17 +223,26 @@ class KeyPhrasesExtractor(object):
                   0, 99)
 
     def save_results(self):
+        """
+        Saves results to a csv file.
+        """
         self.normalize_scores()
         self.df_result.sort_values(
             by=['tag', 'filename', 'score'], inplace=True, ascending=False)
         self.df_result.to_csv("%s.csv" % self.output_name)
 
     def reset(self):
+        """
+        Reset the dataframe.
+        """
         self.file_reader = FilesReader()
         self.df_result = pd.DataFrame(
             columns=['lang', 'tag', 'filename', 'score', 'keyphrase'])
 
     def run(self):
+        """
+        Run all the documents.
+        """
         tag_directories = sorted(glob(os.path.join(self.input_directory, "*")))
         for tag_directory in tag_directories:
             tag = os.path.basename(tag_directory)
@@ -199,6 +256,9 @@ class KeyPhrasesExtractor(object):
         self.save_results()
 
 def arguments():
+    """
+    Parse command line arguments.
+    """
     parser = argparse.ArgumentParser(description='.')
     parser.add_argument(
         'input_directory', help='directory where to find tags folders'
@@ -220,6 +280,9 @@ def arguments():
 
 
 def main(args):
+    """
+    Main function.
+    """
     KeyPhrasesExtractor(args.input_directory, args.output_name,
                         args.top_k_all_docs,
                         args.top_k_by_tag, args.top_k_by_doc,
